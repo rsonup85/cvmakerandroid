@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Outer shield / document folio -->
+    <path
+        android:fillColor="#1E3A8A"
+        android:pathData="M8,6C8,4.89 8.89,4 10,4H30L40,14V42C40,43.11 39.11,44 38,44H10C8.89,44 8,43.11 8,42V6Z" />
+    <!-- Folded corner -->
+    <path
+        android:fillColor="#3B82F6"
+        android:pathData="M30,4L40,14H32C30.89,14 30,13.11 30,12V4Z" />
+    <!-- Gold accent crest lines -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M16,16H26V18H16V16ZM16,22H32V24H16V22ZM16,28H32V30H16V28ZM16,34H28V36H16V34Z" />
+    <!-- Ribbon star / seal -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M34,32L36,35L39.5,35.5L37,38L37.5,41.5L34,40L30.5,41.5L31,38L28.5,35.5L32,35L34,32Z" />
+</vector>
