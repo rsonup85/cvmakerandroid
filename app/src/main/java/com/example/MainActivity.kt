@@ -4,104 +4,77 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.ui.navigation.AppNavigation
+import com.example.editor.viewmodel.EditorViewModel
+import com.example.editor.viewmodel.HomeViewModel
+import com.example.ui.editor.EditorScreen
+import com.example.ui.home.HomeScreen
 import com.example.ui.theme.MyApplicationTheme
-import com.example.ui.viewmodel.BiodataViewModel
-import kotlinx.coroutines.delay
+import com.example.ui.theme.VistaraDarkBackground
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            MyApplicationTheme {
-                var showSplash by remember { mutableStateOf(true) }
-
-                LaunchedEffect(Unit) {
-                    delay(1200) // Brief smooth splash transition
-                    showSplash = false
-                }
-
-                if (showSplash) {
-                    SplashScreen()
-                } else {
-                    val viewModel: BiodataViewModel = viewModel()
-                    AppNavigation(viewModel = viewModel)
-                }
-            }
-        }
-    }
+sealed class Screen {
+    object Home : Screen()
+    data class Editor(val projectId: String) : Screen()
 }
 
-@Composable
-fun SplashScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF0F172A)),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(90.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF1E3A8A)),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_biodata_logo),
-                    contentDescription = "Biodata Maker Logo",
-                    modifier = Modifier.size(60.dp)
-                )
+class MainActivity : ComponentActivity() {
+
+    private val homeViewModel: HomeViewModel by viewModels()
+    private val editorViewModel: EditorViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        com.example.editor.font.FontManager.init(applicationContext)
+        enableEdgeToEdge()
+
+        setContent {
+            MyApplicationTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = VistaraDarkBackground
+                ) {
+                    var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
+
+                    AnimatedContent(
+                        targetState = currentScreen,
+                        transitionSpec = { fadeIn() togetherWith fadeOut() },
+                        label = "screen_navigation"
+                    ) { screen ->
+                        when (screen) {
+                            is Screen.Home -> {
+                                HomeScreen(
+                                    viewModel = homeViewModel,
+                                    onOpenProject = { projectId ->
+                                        currentScreen = Screen.Editor(projectId)
+                                    }
+                                )
+                            }
+                            is Screen.Editor -> {
+                                EditorScreen(
+                                    projectId = screen.projectId,
+                                    viewModel = editorViewModel,
+                                    onNavigateBack = {
+                                        editorViewModel.timelinePlayer.pause()
+                                        currentScreen = Screen.Home
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
             }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Text(
-                text = "Biodata Maker",
-                color = Color.White,
-                fontSize = 26.sp,
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = 0.5.sp
-            )
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            Text(
-                text = "Marriage & Career Biodata PDF Studio",
-                color = Color(0xFF94A3B8),
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            CircularProgressIndicator(
-                modifier = Modifier.size(24.dp),
-                color = Color(0xFF38BDF8),
-                strokeWidth = 2.dp
-            )
         }
     }
 }

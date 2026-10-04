@@ -1,6 +1,6 @@
 {
-  "name": "Biodata Maker",
-  "description": "Professional Marriage and Job Biodata Maker with 100+ templates, PDF export, Razorpay payments, eBook store, and Gemini AI writing enhancement.",
+  "name": "Vistara Edit",
+  "description": "Professional all-in-one mobile video editor featuring non-destructive timeline editing, trimming, splitting, multi-track layers, transitions, audio control, keyframing, and high-performance export.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -1,63 +1,55 @@
 package com.example.ui.theme
 
-import android.os.Build
+import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = PrimaryLightNavy,
-    onPrimary = Color.White,
-    primaryContainer = PrimaryNavy,
-    onPrimaryContainer = Color.White,
-    secondary = RoyalGoldLight,
-    onSecondary = Slate900,
-    background = Slate900,
-    surface = Slate800,
-    onBackground = Color.White,
-    onSurface = Color.White,
-    error = ErrorRed
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = PrimaryNavy,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFDBEAFE),
-    onPrimaryContainer = PrimaryNavyDark,
-    secondary = RoyalGold,
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFFFEF3C7),
-    onSecondaryContainer = Color(0xFF78350F),
-    background = Slate50,
-    surface = Color.White,
-    onBackground = Slate900,
-    onSurface = Slate900,
-    surfaceVariant = Slate100,
-    onSurfaceVariant = Color(0xFF475569),
-    outline = Color(0xFFCBD5E1),
-    outlineVariant = Color(0xFFE2E8F0),
-    error = ErrorRed
+private val VistaraColorScheme = darkColorScheme(
+    primary = VistaraPrimary,
+    onPrimary = VistaraTextPrimary,
+    primaryContainer = VistaraDarkSurfaceHighlight,
+    onPrimaryContainer = VistaraTextPrimary,
+    secondary = VistaraSecondary,
+    onSecondary = VistaraDarkBackground,
+    secondaryContainer = VistaraDarkSurfaceVariant,
+    onSecondaryContainer = VistaraSecondary,
+    tertiary = VistaraTertiary,
+    onTertiary = VistaraDarkBackground,
+    background = VistaraDarkBackground,
+    onBackground = VistaraTextPrimary,
+    surface = VistaraDarkSurface,
+    onSurface = VistaraTextPrimary,
+    surfaceVariant = VistaraDarkSurfaceVariant,
+    onSurfaceVariant = VistaraTextSecondary,
+    outline = VistaraDarkSurfaceBorder,
+    outlineVariant = VistaraDarkSurfaceHighlight
 )
 
 @Composable
 fun MyApplicationTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // Preserve our signature premium biodata palette
-    content: @Composable () -> Unit,
+    dynamicColor: Boolean = false, // Always enforce studio dark theme for professional video editing
+    content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    val colorScheme = VistaraColorScheme
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as? Activity)?.window
+            if (window != null) {
+                window.statusBarColor = VistaraDarkBackground.toArgb()
+                window.navigationBarColor = VistaraDarkBackground.toArgb()
+                val insetsController = WindowCompat.getInsetsController(window, view)
+                insetsController.isAppearanceLightStatusBars = false
+                insetsController.isAppearanceLightNavigationBars = false
+            }
         }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
     }
 
     MaterialTheme(

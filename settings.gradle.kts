@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "Biodata Maker"
+rootProject.name = "Vistara Edit"
 
 include(":app")
