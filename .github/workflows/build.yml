@@ -3,6 +3,8 @@ name: Build Android APK
 on:
   push:
     branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
@@ -18,26 +20,24 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: gradle
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-      - name: Create missing .env and local.properties
+      # 1. google-services.json file create karna (GitHub Secret se)
+      - name: Add google-services.json
+        env:
+          GOOGLE_SERVICES_SECRET: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
-          touch .env.example
-          echo "GEMINI_API_KEY=dummy_key" > .env.example
-          touch .env
-          echo "GEMINI_API_KEY=dummy_key" > .env
-          rm -f local.properties
+          echo "$GOOGLE_SERVICES_SECRET" > app/google-services.json
 
-      - name: Generate Dummy Debug Keystore
-        run: |
-          keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
-
+      # 2. APK Build karna (Headless Flag -Djava.awt.headless=true ke saath)
       - name: Build Debug APK
-        run: gradle assembleDebug
+        run: ./gradlew assembleDebug -Djava.awt.headless=true
 
-      - name: Upload APK Artifact
+      # 3. Generated APK ko download karne ke liye Artifact upload karna
+      - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
